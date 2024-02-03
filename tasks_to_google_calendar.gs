@@ -49,7 +49,6 @@ function listTaskLists() {
                   todaysEventTitle[i] = todaysEvent[i].getTitle()
                 }
                 if (!todaysEventTitle.includes(task.title)) {
-                  Logger.log(`this is a pen`)
                   Logger.log((new Date(task.due).getDate() < new Date().getDate()))
                   CalendarApp.getCalendarsByName(`Tasks`)[0].createAllDayEvent(task.title,
                     new Date(),
@@ -83,7 +82,7 @@ function listTaskLists() {
           for (let i = 0; i < yesterdayEvents.length; i++) {
             if (yesterdayEvents[i].getEndTime() < new Date(new Date().setDate(new Date().getDate()))) {
               yesterdayEvents[i].deleteEvent()
-              Logger.log('event deleted "%s":' + yesterdayEvents[i].getTitle())
+              Logger.log('event deleted:' + yesterdayEvents[i].getTitle())
             }
 
           }

@@ -54,6 +54,14 @@ function listTaskLists() {
               Logger.log("calendar date extended to today")
             }
           }
+         //delete event when done(delete events done for yesterday)
+          const yesterdayEvents = CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(new Date().setDate(new Date().getDate() - 1)))
+          for (let i = 0; i < yesterdayEvents.length; i++) {
+            if (yesterdayEvents[i].getEndTime() < new Date(new Date().setDate(new Date().getDate()))) {
+              yesterdayEvents[i].deleteEvent()
+              Logger.log('event deleted "%s":' + yesterdayEvents[i].getTitle())
+            }
+          }
         } catch (err) {
           // TODO (developer) - Handle exception from Task API
           console.log('Failed with an error %s', err.message);
@@ -62,6 +70,7 @@ function listTaskLists() {
       console.log('Task list with title "%s" and ID "%s" was found.', taskList.title, taskList.id);
 
     }
+
   } catch (err) {
     // TODO (developer) - Handle exception from Task API
     console.log('Failed with an error %s ', err.message);

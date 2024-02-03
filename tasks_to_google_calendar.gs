@@ -1,3 +1,7 @@
+/**
+ * Lists the titles and IDs of tasksList.
+ * @see https://developers.google.com/tasks/reference/rest/v1/tasklists/list
+ */
 function listTaskLists() {
   try {
     // Returns all the authenticated user's task lists.
@@ -12,7 +16,14 @@ function listTaskLists() {
       const taskList = taskLists.items[i];
       const taskListTitle = taskLists.items[i].title;
       const taskListId = taskLists.items[i].id;
+      Logger.log(`TaskList with title "%s" was found.`, taskListTitle);
       if (taskListTitle === "My Tasks") {
+
+        /**
+         * Lists task items for a provided tasklist ID.
+         * @param  {string} taskListId The tasklist ID.
+         * @see https://developers.google.com/tasks/reference/rest/v1/tasks/list
+         */
         try {
           // List the task items of specified tasklist using taskList id.
           const tasks = Tasks.Tasks.list(taskListId);
@@ -26,18 +37,17 @@ function listTaskLists() {
           for (let i = 0; i < tasks.items.length; i++) {
             const task = tasks.items[i];
             taskTitleList[i] = task.title
-            console.log('Task with title "%s" and ID "%s" was found.', task.title, task.id);
+            Logger.log('Task with title "%s" was found.', task.title);
+
             // Determines how many events are happening on due date of task.
 
             var events = CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(task.due));
-            Logger.log(new Date(task.due))
-            Logger.log('Number of events: ' + events.length);
-            //check weather you have alreay created the task event 
+            //check weather you have alreay created the task event on Calendar
             var eventsTitleList = []
             for (let i = 0; i < events.length; i++) {
               eventsTitleList[i] = events[i].getTitle()
             }
-            Logger.log("eventsTitleListCreated")
+            Logger.log("eventsTitleList Created from Calendar")
             if (
               !eventsTitleList.includes(task.title)
             ) {
@@ -49,10 +59,13 @@ function listTaskLists() {
                   todaysEventTitle[i] = todaysEvent[i].getTitle()
                 }
                 if (!todaysEventTitle.includes(task.title)) {
-                  Logger.log((new Date(task.due).getDate() < new Date().getDate()))
                   CalendarApp.getCalendarsByName(`Tasks`)[0].createAllDayEvent(task.title,
                     new Date(),
                   );
+                  Logger.log(`due date not setted task event created: ` + task.title + `(due date not setted)` + new Date())
+                }
+                else {
+                  Logger.log(`due date not setted task event already been created`)
                 }
               }
               //due date setted
@@ -67,22 +80,25 @@ function listTaskLists() {
             }
             //when task not completed till due date
             else {
-              Logger.log(task.title)
               //due date not setted
               if ((new Date(task.due).getDate() < new Date().getDate())) {
                 const starttime = CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(task.due))[eventsTitleList.indexOf(task.title)].getStartTime()
                 CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(task.due))[eventsTitleList.indexOf(task.title)].setAllDayDates(starttime, new Date(new Date().setDate(new Date().getDate() + 1)))
                 Logger.log("calendar date extended to today")
               }
+              else {
+                Logger.log(`calendar date is already extended to today`)
+              }
             }
           }
-
           //delete event when done(delete events done for yesterday)
           const yesterdayEvents = CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(new Date().setDate(new Date().getDate() - 1)))
           for (let i = 0; i < yesterdayEvents.length; i++) {
             if (yesterdayEvents[i].getEndTime() < new Date(new Date().setDate(new Date().getDate()))) {
               yesterdayEvents[i].deleteEvent()
-              Logger.log('event deleted:' + yesterdayEvents[i].getTitle())
+              Logger.log('event deleted "%s":' + yesterdayEvents[i].getTitle())
+            } else {
+              Logger.log(`no events to delete`)
             }
 
           }
@@ -92,11 +108,12 @@ function listTaskLists() {
         }
 
 
+      } else {
+        Logger.log(taskListTitle, `was found`)
       }
       console.log('Task list with title "%s" and ID "%s" was found.', taskList.title, taskList.id);
 
     }
-
   } catch (err) {
     // TODO (developer) - Handle exception from Task API
     console.log('Failed with an error %s ', err.message);

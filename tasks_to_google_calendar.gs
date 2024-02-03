@@ -81,7 +81,7 @@ function listTaskLists() {
             //when task not completed till due date
             else {
               //due date not setted
-              if ((new Date(task.due).getDate() < new Date().getDate())) {
+              if ((new Date(task.due) < new Date())) {
                 const starttime = CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(task.due))[eventsTitleList.indexOf(task.title)].getStartTime()
                 CalendarApp.getCalendarsByName(`Tasks`)[0].getEventsForDay(new Date(task.due))[eventsTitleList.indexOf(task.title)].setAllDayDates(starttime, new Date(new Date().setDate(new Date().getDate() + 1)))
                 Logger.log("calendar date extended to today")
@@ -119,7 +119,3 @@ function listTaskLists() {
     console.log('Failed with an error %s ', err.message);
   }
 }
-
-
-
-
